@@ -64,6 +64,11 @@ bool verifDiagonaleMontante(jeu *j, uint32_t l, uint32_t c);
 /*Utilsation des différentes vérifications*/
 bool victoire(jeu *j, uint32_t l, uint32_t c);
 
-/*Implémentation du mode JoueurVSJoueur :  Permet à un joue de jouer*/
-uint32_t tourJoueur(jeu * j,caseG couleur,uint32_t *l,uint32_t *c);
+/*Pour le  mode à 2 joueur :  Permet à un joueur de placer un coup*/
+bool tourJoueur(jeu * j,caseG couleur,uint32_t *l,uint32_t *c);
+
+/*Implémentation du mode à 2 joueurs*/
+/*Le jeu est initilalisé selon les constantes symboliques*/
+void joueurVSjoueur();
+
 #endif

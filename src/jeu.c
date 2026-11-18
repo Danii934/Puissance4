@@ -70,7 +70,7 @@ void afficher_curseur(jeu *j, uint32_t curseur) {
     assert(curseur < j->nb_colonnes);
 
     for (uint32_t k = 0; k < j->nb_colonnes; k++)
-        printf(k == curseur ? "^" : "  ");
+        printf(k == curseur ? "^ " : "  ");
     putchar('\n');
 }
 
@@ -107,13 +107,18 @@ uint32_t appliquerCoup(jeu *j, uint32_t col, caseG couleur) {
         i--;                             
     j->grille[i][col] = couleur;
     return i;
-}
+}   
 
-uint32_t tourJoueur(jeu * j,caseG couleur,uint32_t *l,uint32_t *c){
+/*Representation d'un tour de jeu : J1 joue Rouge, J2 Joue Jaune
+*** Si la valeur renvoyée est 0  => Abandon
+*** Sinon Le Joueur continue a jouer 
+*/
+bool tourJoueur(jeu * j,caseG couleur,uint32_t *l,uint32_t *c){
     uint32_t pos_curseur = 0;
     char move;
-    uint32_t pas_joue = 1;
+    bool pas_joue = 1;
     while(pas_joue){
+         printf("\nTour du %s\n", (couleur == ROUGE) ? "J1" : "J2");
         afficher_jeu(j);
         afficher_curseur(j,pos_curseur);
         move = lire_coup();
@@ -139,14 +144,18 @@ uint32_t tourJoueur(jeu * j,caseG couleur,uint32_t *l,uint32_t *c){
                     puts("Choisissez une autre colonne svp");
                 }
                 break;
+            case 'x' : 
+                /*Abandon */
+                return false;
+                
             default :
-                return 0;
                 break;
         }
 
     }
-    return 1;
+    return true;
 }
+
 bool matchNul(jeu *j) {
     assert(j != NULL);
     for (uint32_t k = 0; k < j->nb_colonnes; k++)
@@ -214,4 +223,41 @@ bool victoire(jeu *j, uint32_t l, uint32_t c) {
         || verifHorizontale(j, l, c)
         || verifDiagonaleDescendante(j, l, c)
         || verifDiagonaleMontante(j, l, c);
+}
+
+/*Implémentation du mode à 2 joueurs qui jouent a tour de role*/
+void joueurVSjoueur(){
+    jeu * j = creer_jeu(NB_LIGNES,NB_COLONNES);
+    caseG tour = ROUGE;
+    uint32_t l,c;
+
+    while (true)    
+    {
+        uint32_t a_joue =  tourJoueur(j,tour,&l,&c);
+        
+        if(a_joue)
+        {
+            if (victoire(j,l,c))
+            {
+                afficher_jeu(j);
+                printf("Victoire du %s\n",(tour == ROUGE) ? "J1" : "J2");
+                break;
+            }
+            if(matchNul(j))
+            {
+                afficher_jeu(j);
+                printf("Match Nul\n");
+                break;
+            }
+
+            tour = (tour == ROUGE) ? JAUNE : ROUGE;
+        }
+        else
+        {
+            printf("Abandon de la part du %s\n",(tour == ROUGE) ? "J1" : "J2");
+            break;
+        }
+    }
+    liberer_jeu(j);
+    
 }
