@@ -1,13 +1,19 @@
-#include <stdio.h>
 #include "../include/jeu.h"
 
 int main(void) {
     jeu *j = creer_jeu(NB_LIGNES, NB_COLONNES);
-    jeu *c = copier_jeu(j);
+    for (uint32_t i = 0; i < 4; i++)
+    {
 
-    printf("Jeu %u x %u créé et copié\n", j->nb_lignes, j->nb_colonnes);
-
-    liberer_jeu(c);
+        for (uint32_t k = i+1; k <4 ; k++)
+        {
+             appliquerCoup(j, i, JAUNE);
+        }
+        appliquerCoup(j,i,ROUGE);
+    } 
+    
+    afficher_jeu(j);
+    printf("Diagonale Descandante : %d\n", verifDiagonaleDescendante(j, 2,0));
     liberer_jeu(j);
     return 0;
 }
