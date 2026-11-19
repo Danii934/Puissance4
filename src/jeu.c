@@ -86,6 +86,10 @@ char lire_coup(void) {
             ;
 
         c = (char)tolower((unsigned char)c);
+
+        if (c == '\0')
+            return 'x';
+
         if (c == 'q' || c == 'd' || c == 'j' || c == 'x')
             return c;
     }
@@ -260,4 +264,100 @@ void joueurVSjoueur(){
     }
     liberer_jeu(j);
     
+}
+void menu()
+{
+    char choix;
+    puts("**************************************************");
+    puts("*******************PUISSANCE 4********************");
+    puts("**************************************************");
+    do
+    {
+        puts("Choisissez un mode :");
+        puts("1 : Joueur contre Joueur");
+        puts("2 : Joueur contre IA");
+        puts("3 : Quitter");
+        printf("Votre choix : ");
+        scanf(" %c",&choix);
+    } while (choix != '1' && choix != '2' && choix != '3');
+    switch (choix)
+    {
+        case '1':
+            joueurVSjoueur();
+            break;
+        
+        case '2' :
+            //joueurVSIA();
+            break;
+        
+        default:
+            puts("A la prochaine :)");
+            break;
+    }
+}
+
+/********************************/
+/********************************/
+/********************************/
+/********** Partie IA************/
+/********************************/
+/********************************/
+/********************************/
+/********************************/
+
+/*Fonctions de calcul de score de la grille*/
+
+int32_t calculScore(uint32_t nb_rouge, uint32_t nb_jaune, uint32_t nb_vide) {
+    if (nb_jaune == 4) return 100;
+    if (nb_rouge == 4) return -95;
+    if (nb_jaune == 3 && nb_vide == 1) return 5;
+    if (nb_rouge == 3 && nb_vide == 1) return -4;
+    if (nb_jaune == 2 && nb_vide == 2) return 2;
+    if (nb_rouge == 2 && nb_vide == 2) return -1;
+    return 0;
+}
+
+// Score de la fenêtre de 4 cases qui commence en (l, c) dans la direction (dl, dc).
+// Renvoie 0 si la fenêtre sort de la grille.
+int32_t scoreFenetre(jeu *j, uint32_t l, uint32_t c, int32_t dl, int32_t dc) {
+    int32_t fin_l = (int32_t)l + (NB_ALIGNES - 1) * dl;
+    int32_t fin_c = (int32_t)c + (NB_ALIGNES - 1) * dc;
+
+    if (fin_l < 0 || fin_l >= (int32_t)j->nb_lignes ||
+        fin_c < 0 || fin_c >= (int32_t)j->nb_colonnes)
+        return 0;
+
+    uint32_t nb_rouge = 0, nb_jaune = 0, nb_vide = 0;
+    for (int32_t n = 0; n < NB_ALIGNES; n++) {
+        caseG v = j->grille[(int32_t)l + n * dl][(int32_t)c + n * dc];
+        if (v == ROUGE)      nb_rouge++;
+        else if (v == JAUNE) nb_jaune++;
+        else                 nb_vide++;
+    }
+    return calculScore(nb_rouge, nb_jaune, nb_vide);
+}
+
+int32_t scoreGrilleHorizontale(jeu *j, uint32_t l, uint32_t c) {
+    return scoreFenetre(j, l, c, 0, 1);     // vers la droite
+}
+int32_t scoreGrilleVerticale(jeu *j, uint32_t l, uint32_t c) {
+    return scoreFenetre(j, l, c, 1, 0);     // vers le bas
+}
+int32_t scoreGrilleDiagonale1(jeu *j, uint32_t l, uint32_t c) {
+    return scoreFenetre(j, l, c, 1, 1);     // vers le bas-droite
+}
+int32_t scoreGrilleDiagonale2(jeu *j, uint32_t l, uint32_t c) {
+    return scoreFenetre(j, l, c, 1, -1);    // vers le bas-gauche
+}
+
+int32_t scoreGrille(jeu *j) {
+    assert(j != NULL);
+    int32_t score = 0;
+    for (uint32_t i = 0; i < j->nb_lignes; i++)
+        for (uint32_t k = 0; k < j->nb_colonnes; k++)
+            score += scoreGrilleHorizontale(j, i, k)
+                   + scoreGrilleVerticale(j, i, k)
+                   + scoreGrilleDiagonale1(j, i, k)
+                   + scoreGrilleDiagonale2(j, i, k);
+    return score;
 }

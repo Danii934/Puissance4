@@ -71,4 +71,21 @@ bool tourJoueur(jeu * j,caseG couleur,uint32_t *l,uint32_t *c);
 /*Le jeu est initilalisé selon les constantes symboliques*/
 void joueurVSjoueur();
 
+/********************************/
+/********************************/
+/********************************/
+/********** Partie IA************/
+/********************************/
+/********************************/
+/********************************/
+/********************************/
+
+/*Fonctions de calcul de score de la grille*/
+int32_t calculScore(uint32_t nb_rouge, uint32_t nb_jaune, uint32_t nb_vide);
+int32_t scoreFenetre(jeu *j, uint32_t l, uint32_t c, int32_t dl, int32_t dc);
+int32_t scoreGrilleHorizontale(jeu *j, uint32_t l, uint32_t c);
+int32_t scoreGrilleVerticale(jeu *j, uint32_t l, uint32_t c);
+int32_t scoreGrilleDiagonale1(jeu *j, uint32_t l, uint32_t c);
+int32_t scoreGrilleDiagonale2(jeu *j, uint32_t l, uint32_t c);
+int32_t scoreGrille(jeu *j);
 #endif
