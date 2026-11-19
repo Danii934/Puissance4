@@ -1,4 +1,3 @@
-// arbre.c
 #include <assert.h>
 #include <stdlib.h>
 #include "../include/arbre.h"
@@ -128,4 +127,81 @@ void developperCoupsNiveau(noeud *r, uint32_t niveau, uint32_t hauteur_max) {
 void developperCoupsArbre(arbre *a) {
     assert(a != NULL);
     developperCoupsNiveau(a->racine, 0, HAUTEUR_MAX);
+}
+
+/**************************************
+***************************************
+Implémentation du minimax et du mode IA
+***************************************
+****************************************/
+
+
+/*Utilisation de l'algorithme minimax pour le choix du prochain coup*/
+int32_t minimax(noeud *r) {
+    assert(r != NULL);
+
+    if (r->enfants == NULL) {                 
+        r->score = scoreGrille(r->config);
+        return r->score;
+    }
+
+    bool maximiser = (r->enfants->tour == IA);
+    int32_t meilleur = minimax(r->enfants);
+    for (noeud *e = r->enfants->frere; e != NULL; e = e->frere) {
+        int32_t s = minimax(e);
+        if (maximiser ? (s > meilleur) : (s < meilleur))
+            meilleur = s;
+    }
+    r->score = meilleur;
+    return meilleur;
+}
+/*Permet a l'IA de jouer*/
+void tourIA(jeu *j, uint32_t *l, uint32_t *c) {
+    assert(j != NULL);
+    assert(!matchNul(j));
+
+    arbre *a = creerArbre(creerNoeud(copier_jeu(j)));
+    developperCoupsArbre(a);
+    int32_t best = minimax(a->racine);
+
+    noeud *m = a->racine->enfants;
+    while (m->score != best)           // premier enfant au meilleur score
+        m = m->frere;
+    *c = m->choix;
+
+    libererArbre(a);                   // après avoir lu m->choix
+    *l = appliquerCoup(j, *c, JAUNE);
+}
+
+/*Mode Joueur vs IA*/
+void joueurVSIA() {
+    jeu *j = creer_jeu(NB_LIGNES, NB_COLONNES);
+    role tour = JOUEUR;
+    uint32_t l = 0, c = 0;
+
+    while (true) {
+        if (tour == JOUEUR) {
+            puts("\nA vous de jouer");
+            if (!tourJoueur(j, ROUGE, &l, &c)) {
+                puts("Vous avez abandonné");
+                break;
+            }
+        } else {
+            tourIA(j, &l, &c);
+            puts("\nL'IA a joué");
+        }
+
+        if (victoire(j, l, c)) {
+            afficher_jeu(j);
+            puts(tour == JOUEUR ? "Victoire !" : "L'IA a gagné");
+            break;
+        }
+        if (matchNul(j)) {
+            afficher_jeu(j);
+            puts("Match nul");
+            break;
+        }
+        tour = (tour == IA) ? JOUEUR : IA;
+    }
+    liberer_jeu(j);
 }

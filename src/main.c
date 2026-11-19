@@ -1,14 +1,40 @@
 #include "../include/jeu.h"
+#include "../include/arbre.h"
+
+void menu();
 
 int main(void) {
-    // menu();
-    // grille vide : score attendu 0
-    jeu * j = creer_jeu(NB_LIGNES,NB_COLONNES);
-    printf("%d\n", scoreGrille(j));
-
-    // 3 jaunes alignés en bas, case suivante vide :
-    j->grille[5][0] = JAUNE; j->grille[5][1] = JAUNE; j->grille[5][2] = JAUNE;
-    printf("%d\n", scoreGrille(j));
-    liberer_jeu(j);
+    menu();
     return 0;
+}
+
+void menu()
+{
+    char choix;
+    puts("**************************************************");
+    puts("*******************PUISSANCE 4********************");
+    puts("**************************************************");
+    do
+    {
+        puts("Choisissez un mode :");
+        puts("1 : Joueur contre Joueur");
+        puts("2 : Joueur contre IA");
+        puts("3 : Quitter");
+        printf("Votre choix : ");
+        scanf(" %c",&choix);
+    } while (choix != '1' && choix != '2' && choix != '3');
+    switch (choix)
+    {
+        case '1':
+            joueurVSjoueur();
+            break;
+        
+        case '2' :
+            joueurVSIA();
+            break;
+        
+        default:
+            puts("A la prochaine :)");
+            break;
+    }
 }

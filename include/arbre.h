@@ -44,4 +44,8 @@ void developperCoupsNoeud(noeud *r);
 void developperCoupsNiveau(noeud *r, uint32_t niveau, uint32_t hauteur_max);
 void developperCoupsArbre(arbre *a);
  
+/*Minmax et mode IA*/
+int32_t minimax(noeud *r);
+void tourIA(jeu *j, uint32_t *l, uint32_t *c);
+void joueurVSIA();
 #endif
